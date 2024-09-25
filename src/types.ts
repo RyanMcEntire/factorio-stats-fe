@@ -19,3 +19,18 @@ export type SnapshotData = {
   research: ResearchData;
   mods: ModsData;
 };
+
+export enum ApiStatus {
+  Loading,
+  Success,
+  ErrorUnauthorized,
+  Error,
+  RefreshingToken,
+  Retrying,
+}
+
+export interface IApiData {
+  status: ApiStatus;
+  error: any;
+  data: any;
+}
