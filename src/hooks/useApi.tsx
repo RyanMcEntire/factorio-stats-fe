@@ -1,112 +1,59 @@
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
 
 export enum ApiStatus {
+  Idle,
   Loading,
   Success,
-  ErrorUnauthorized,
   Error,
-  RefreshingToken,
-  Retrying,
 }
 
-interface IApiData {
+interface ApiResponse<T> {
   status: ApiStatus;
-  error: any;
-  data: any;
+  data: T | null;
+  error: Error | null;
 }
 
-export const useApi = (url: string, body = {}) => {
-  const [retryToggle, setRetryToggle] = useState(false);
-  const [data, setData] = React.useState<IApiData>({
-    status: ApiStatus.Loading,
-    error: null,
+const API_KEY = import.meta.env.VITE_API_KEY as string;
+
+export function useApi<T>(url: string): ApiResponse<T> {
+  const [state, setState] = useState<ApiResponse<T>>({
+    status: ApiStatus.Idle,
     data: null,
+    error: null,
   });
 
-  React.useEffect(() => {
-    if (data.status === ApiStatus.RefreshingToken) {
-      console.log("Attempting to refresh access token");
-      myRefreshTokenFn() // TODO: implement this
-        .then(() => {
-          setData({
-            status: ApiStatus.Retrying,
-            data: null,
-            error: null,
-          });
-
-          setRetryToggle((i: boolean) => !i);
-        })
-        .catch((err: MyRefreshTokenError) => {
-          if (err === MyRefreshTokenError.Expired) {
-            setData({
-              status: ApiStatus.ErrorUnauthorized,
-              data: null,
-              error: err,
-            });
-          } else {
-            setData({
-              status: ApiStatus.Error,
-              data: null,
-              error: err,
-            });
-          }
+  useEffect(() => {
+    const fetchData = async () => {
+      setState((prev) => ({ ...prev, status: ApiStatus.Loading }));
+      try {
+        const response = await fetch(url, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${API_KEY}`,
+            "Content-Type": "application/json",
+          },
         });
-      return;
-    }
-    const authToken = myAuthTokenFn(); // TODO: implement this
-    const request: RequestInit = {
-      method: "POST",
-      body: JSON.stringify(body),
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${authToken}`,
-      },
+
+        if (!response.ok) {
+          throw new Error(response.statusText);
+        }
+
+        const data = await response.json();
+        setState({ status: ApiStatus.Success, data, error: null });
+      } catch (error) {
+        setState({
+          status: ApiStatus.Error,
+          data: null,
+          error:
+            error instanceof Error
+              ? error
+              : new Error("An unknown error occurred"),
+        });
+      }
     };
 
-    fetch(url, request)
-      .then((response) => {
-        if (!response.ok) {
-          throw Error(response.statusText);
-        }
-        return response.json();
-      })
-      .then((data) => {
-        setData({
-          status: ApiStatus.Success,
-          error: null,
-          data,
-        });
-      })
-      .catch((err: Error) => {
-        if (data.status === ApiStatus.Retrying) {
-          console.log("Unauthorized. Not retrying:", data.status);
-          setData({
-            status: ApiStatus.ErrorUnauthorized,
-            data: null,
-            error: err,
-          });
-          return;
-        }
+    fetchData();
+  }, [url]);
 
-        switch (err.message) {
-          case "Unauthorized":
-            setData({
-              status: ApiStatus.RefreshingToken,
-              data: null,
-              error: err,
-            });
-
-            setRetryToggle((i: boolean) => !i);
-            break;
-          default:
-            setData({
-              status: ApiStatus.Error,
-              data: null,
-              error: err,
-            });
-        }
-      });
-  }, [retryToggle]);
-
-  return data;
-};
+  return state;
+}
