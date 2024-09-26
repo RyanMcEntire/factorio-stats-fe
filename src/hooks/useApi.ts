@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 
 export enum ApiStatus {
-  Idle,
-  Loading,
-  Success,
-  Error,
+  Idle = "idle",
+  Loading = "loading",
+  Success = "success",
+  Error = "error",
 }
 
 interface ApiResponse<T> {
