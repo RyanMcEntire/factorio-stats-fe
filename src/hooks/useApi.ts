@@ -32,6 +32,7 @@ export function useApi<T>(url: string): ApiResponse<T> {
             Authorization: `Bearer ${API_KEY}`,
             "Content-Type": "application/json",
           },
+          credentials: "include",
         });
 
         if (!response.ok) {
