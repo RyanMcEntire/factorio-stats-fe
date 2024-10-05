@@ -34,3 +34,33 @@ export interface IApiData {
   error: any;
   data: any;
 }
+
+export interface ApiItem {
+  id: number;
+  tick: string;
+  item: string;
+  amount: number;
+  created_at: string;
+}
+
+export interface ResearchItem {
+  id: number;
+  tick: string;
+  technology: string;
+  created_at: string;
+}
+
+export interface ModItem {
+  id: number;
+  tick: string;
+  name: string;
+  version: string;
+  created_at: string;
+}
+
+export interface ApiData {
+  production: ApiItem[];
+  consumption: ApiItem[];
+  research: ResearchItem[];
+  mods: ModItem[];
+}
