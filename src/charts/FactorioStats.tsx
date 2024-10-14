@@ -1,26 +1,7 @@
 import React from "react";
 import { useApiContext } from "../utility-components/ApiContext.tsx";
 import { ProductionConsumptionItem, ApiStatus } from "../types.ts";
-
-const ProductionConsumptionList: React.FC<{
-  items: ProductionConsumptionItem[];
-  title: string;
-}> = ({ items, title }) => (
-  <div>
-    <h3>{title}</h3>
-    {items.length > 0 ? (
-      <ul>
-        {items.map((item, index) => (
-          <li key={index}>
-            {item.item}: {item.delta_amount} (Tick: {item.tick})
-          </li>
-        ))}
-      </ul>
-    ) : (
-      <p>No {title.toLowerCase()} data available.</p>
-    )}
-  </div>
-);
+import { ProductionConsumptionChart } from "./ProductionConsumptionChart.tsx";
 
 const SurfaceComponent: React.FC<{
   surfaceName: string;
@@ -29,8 +10,14 @@ const SurfaceComponent: React.FC<{
 }> = ({ surfaceName, productionData, consumptionData }) => (
   <div>
     <h2>Surface: {surfaceName}</h2>
-    <ProductionConsumptionList items={productionData} title="Production" />
-    <ProductionConsumptionList items={consumptionData} title="Consumption" />
+    <ProductionConsumptionChart
+      data={productionData}
+      title={`Production - ${surfaceName}`}
+    />
+    <ProductionConsumptionChart
+      data={consumptionData}
+      title={`Consumption - ${surfaceName}`}
+    />
   </div>
 );
 
