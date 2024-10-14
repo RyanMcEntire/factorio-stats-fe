@@ -1,13 +1,15 @@
-import ProdSnapshotBarChart from "./charts/ProdSnapshotBarChart";
+import { FactorioStats } from "./charts/FactorioStats";
 import { ApiProvider } from "./utility-components/ApiContext";
+import ErrorBoundary from "./utility-components/ErrorBoundary";
 
 export default function App() {
   return (
-    <ApiProvider>
-      <div>
-        <h1>Total Produced Items</h1>
-        <ProdSnapshotBarChart />
-      </div>
-    </ApiProvider>
+    <ErrorBoundary>
+      <ApiProvider>
+        <div>
+          <FactorioStats />
+        </div>
+      </ApiProvider>
+    </ErrorBoundary>
   );
 }

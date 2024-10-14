@@ -21,12 +21,10 @@ export type SnapshotData = {
 };
 
 export enum ApiStatus {
-  Loading,
-  Success,
-  ErrorUnauthorized,
-  Error,
-  RefreshingToken,
-  Retrying,
+  Idle = "idle",
+  Loading = "loading",
+  Success = "success",
+  Error = "error",
 }
 
 export interface IApiData {
@@ -52,9 +50,19 @@ export interface ModItem {
   version: string;
 }
 
+export interface ProductionConsumptionItem {
+  tick: string;
+  item: string;
+  delta_amount: number;
+}
+
+export interface SurfaceData {
+  [surfaceName: string]: ProductionConsumptionItem[];
+}
+
 export interface ApiData {
-  production: ApiItem[];
-  consumption: ApiItem[];
+  production: SurfaceData;
+  consumption: SurfaceData;
   research: ResearchItem[];
   mods: ModItem[];
 }
