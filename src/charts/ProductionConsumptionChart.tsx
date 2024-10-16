@@ -11,6 +11,8 @@ import {
 } from "recharts";
 import { ProductionConsumptionItem } from "../types.ts";
 
+// TODO: Plan out rework to chart.js instead of recharts
+
 interface ChartData {
   tick: string;
   relativeTime: number;
@@ -54,10 +56,10 @@ export const ProductionConsumptionChart: React.FC<
     const newestTick = Number(sortedData[0].tick);
 
     sortedData.forEach((item) => {
-      item.relativeTime = (newestTick - Number(item.tick)) / 60; // Convert to seconds
+      item.relativeTime = (newestTick - Number(item.tick)) / 60;
     });
 
-    return sortedData.reverse(); // Reverse to have oldest data first
+    return sortedData.reverse();
   }, [data]);
 
   const items = React.useMemo(
@@ -72,10 +74,18 @@ export const ProductionConsumptionChart: React.FC<
   };
 
   return (
-    <div style={{ width: "100%", height: 400 }}>
+    <div style={{ width: "95%", height: "75%" }}>
       <h2>{title}</h2>
       <ResponsiveContainer>
-        <LineChart data={processedData}>
+        <LineChart
+          data={processedData}
+          margin={{
+            top: 10,
+            right: 30,
+            left: 40,
+            bottom: 40,
+          }}
+        >
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis
             dataKey="relativeTime"
@@ -93,13 +103,8 @@ export const ProductionConsumptionChart: React.FC<
               position: "insideLeft",
             }}
           />
-          <Tooltip
-            formatter={(value, name, props) => [
-              `${value}`,
-              `${name} (${formatXAxis(props.payload.relativeTime)})`,
-            ]}
-          />
-          <Legend />
+          <Tooltip />
+          <Legend verticalAlign="bottom" height={36} />
           {items.map((item, index) => (
             <Line
               key={item}
